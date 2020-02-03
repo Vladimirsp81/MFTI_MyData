@@ -25,8 +25,8 @@ parser.add_argument('--num_epochs', type=int, default=100)
 parser.add_argument('--batchSize', type=int, default=1, help='test Batch size')
 
 # Разное
-parser.add_argument('--model_path', type=str, default='./MFTI_Temp/models')
-parser.add_argument('--sample_path', type=str, default='./MFTI_Temp/test_results')
+parser.add_argument('--model_path', type=str, default='./MFTI_MyData/models')
+parser.add_argument('--sample_path', type=str, default='./MFTI_MyData/test_results')
 
 ##### Вспомогательная функция для загрузки данных и их предобработки
 IMG_EXTENSIONS = [
@@ -43,7 +43,7 @@ class ImageFolder(data.Dataset):
         self.transform = transforms.Compose([transforms.ToTensor(),
                                              transforms.Normalize((0.5, 0.5, 0.5),
                                                                   (0.5, 0.5, 0.5))])
-        self.dir_AB = os.path.join(opt.dataroot, 'train')  # ./edges2shoes/train
+        self.dir_AB = os.path.join(opt.dataroot, 'val')  # ./masterplans/val
         self.image_paths = list(map(lambda x: os.path.join(self.dir_AB, x), os.listdir(self.dir_AB)))
 
     def __getitem__(self, index):
@@ -86,7 +86,7 @@ def main():
                                   batch_size=args.batchSize,
                                   shuffle=True,
                                   num_workers=2,
-                                  drop_last=True)
+                                  drop_last=False)
 
     if not os.path.exists(args.model_path):
         os.makedirs(args.model_path)
