@@ -26,7 +26,7 @@ parser.add_argument('--no_flip', action='store_true', help='if specified, do not
 
 # Гипер параметры обучения и оптимизатора
 parser.add_argument('--num_epochs', type=int, default=100)
-parser.add_argument('--batchSize', type=int, default=1, help='input batch size')
+parser.add_argument('--batchSize', type=int, default=4, help='input batch size')
 parser.add_argument('--lr', type=float, default=0.0002)
 parser.add_argument('--beta1', type=float, default=0.5)  # начальное значение моментума для Adam
 parser.add_argument('--beta2', type=float, default=0.999)  # верхнее значение моментума для Adam
@@ -35,11 +35,11 @@ parser.add_argument('--lambda_A', type=float, default=100.0)
 # Разное
 parser.add_argument('--model_path', type=str, default='./MFTI_MyData/models')  # путь временного сохранения весов модели
 parser.add_argument('--sample_path', type=str, default='./MFTI_MyData/results')  # Путь сохранения образцов изображений 
-parser.add_argument('--log_step', type=int, default=10)
-parser.add_argument('--sample_step', type=int, default=100)
+parser.add_argument('--log_step', type=int, default=1)
+parser.add_argument('--sample_step', type=int, default=1)
 parser.add_argument('--num_workers', type=int, default=2)
 
-##### Вспомогательная функция для загрузки данных и их предобработки
+# Функция для загрузки данных и их предобработки
 class ImageFolder(data.Dataset):
     def __init__(self, opt):
         # os.listdir функция, возвращающая перечень папок
@@ -67,7 +67,7 @@ class ImageFolder(data.Dataset):
     def __len__(self):
         return len(self.image_paths)
 
-##### Функция для обучения на GPU
+# Функция для обучения на GPU
 def to_variable(x):
     if torch.cuda.is_available():
         x = x.cuda()
@@ -78,7 +78,7 @@ def denorm(x):
     out = (x + 1) / 2
     return out.clamp(0, 1)
 
-##### Функция для определения GAN Loss
+# Функция для определения GAN Loss
 def GAN_Loss(input, target, criterion):
     if target == True:
         tmp_tensor = torch.FloatTensor(input.size()).fill_(1.0)
@@ -92,7 +92,7 @@ def GAN_Loss(input, target, criterion):
 
     return criterion(input, labels)
 
-######################### Функция для обучения
+# Функция для обучения
 def main():
     # Объявление загрузчика
     cudnn.benchmark = True
@@ -131,7 +131,7 @@ def main():
         generator = generator.cuda()
         discriminator = discriminator.cuda()
 
-    """Train generator and discriminator."""
+    """Обучение Генератора и Дискриминатора."""
     total_step = len(data_loader) # Для принта лога
     for epoch in range(args.num_epochs):
         for i, sample in enumerate(data_loader):
@@ -140,14 +140,12 @@ def main():
             input_A = sample['A']
             input_B = sample['B']
 
-            # ===================== Обучение Дескриминатора =====================#
+            # ===================== Обучение Дескриминатора =====================
             discriminator.zero_grad()
 
             real_A = to_variable(input_A)
             fake_B = generator(real_A)
             real_B = to_variable(input_B)
-
-            # d_optimizer.zero_grad()
 
             pred_fake = discriminator(real_A, fake_B)
             loss_D_fake = GAN_Loss(pred_fake, False, criterionGAN)
@@ -160,17 +158,17 @@ def main():
             loss_D.backward(retain_graph=True)
             d_optimizer.step()
 
-            # ===================== Обучение Генератора =====================#
-            generator.zero_grad()
+            # ===================== Обучение Генератора =====================
+            ##generator.zero_grad()
 
-            pred_fake = discriminator(real_A, fake_B)
-            loss_G_GAN = GAN_Loss(pred_fake, True, criterionGAN)
+            #pred_fake = discriminator(real_A, fake_B)
+            #loss_G_GAN = GAN_Loss(pred_fake, True, criterionGAN)
 
-            loss_G_L1 = criterionL1(fake_B, real_B)
+            #loss_G_L1 = criterionL1(fake_B, real_B)
 
-            loss_G = loss_G_GAN + loss_G_L1 * args.lambda_A
-            loss_G.backward()
-            g_optimizer.step()
+            #loss_G = loss_G_GAN + loss_G_L1 * args.lambda_A
+            #loss_G.backward()
+            #g_optimizer.step()
 
             # принт лога обучения
             if (i + 1) % args.log_step == 0:
