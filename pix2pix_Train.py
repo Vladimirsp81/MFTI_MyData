@@ -14,7 +14,7 @@ from torchvision import datasets
 from PIL import Image
 from Generator_Descriminator import *
 
-parser = argparse.ArgumentParser(description='Pix2Pix for edges-shoes')
+parser = argparse.ArgumentParser(description='Pix2Pix for masterplans')
 
 # Общие параметры
 parser.add_argument('--dataroot', required=True, help='path to images (should have subfolders train, val, etc)')
@@ -114,7 +114,11 @@ def main():
 
     # Объявление сетей
     generator = Generator(args.batchSize)
-    generator.load_state_dict(torch.load('/content/MFTI_MyData/models/weights/generator-15.pkl'))
+    #generator.load_state_dict(torch.load('/content/MFTI_MyData/models/weights/generator-15.pkl'))
+    checkpoint = torch.load('/content/MFTI_MyData/models/weights/generator-10.pkl')
+    generator.load_state_dict(checkpoint['model_state_dict'])
+    #epoch = checkpoint['epoch']
+    #loss_G = checkpoint['loss']
     generator.eval()
 
     discriminator = Discriminator(args.batchSize)
@@ -125,6 +129,7 @@ def main():
 
     # Задание оптимизаторов для сетей
     g_optimizer = optim.Adam(generator.parameters(), args.lr, [args.beta1, args.beta2])
+    g_optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     d_optimizer = optim.Adam(discriminator.parameters(), args.lr, [args.beta1, args.beta2])
 
     if torch.cuda.is_available():
@@ -161,12 +166,12 @@ def main():
             # ===================== Обучение Генератора =====================
             ##generator.zero_grad()
 
-            #pred_fake = discriminator(real_A, fake_B)
-            #loss_G_GAN = GAN_Loss(pred_fake, True, criterionGAN)
+            pred_fake = discriminator(real_A, fake_B)
+            loss_G_GAN = GAN_Loss(pred_fake, True, criterionGAN)
 
-            #loss_G_L1 = criterionL1(fake_B, real_B)
+            loss_G_L1 = criterionL1(fake_B, real_B)
 
-            #loss_G = loss_G_GAN + loss_G_L1 * args.lambda_A
+            loss_G = loss_G_GAN + loss_G_L1 * args.lambda_A
             #loss_G.backward()
             #g_optimizer.step()
 
