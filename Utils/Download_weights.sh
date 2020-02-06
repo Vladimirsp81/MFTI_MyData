@@ -1,5 +1,5 @@
 FILE=generator-10
-URL=https://docs.live.net/s!AscSoIbqe-jLg9gt-LQe-ZrFQTjhNQ?e=QFbX8m
+URL=https://docs.live.net/s!AscSoIbqe-jLg9gv2ohRw7aD78KuXg?e=PY6Odf
 TAR_FILE=./MFTI_MyData/models/$FILE.zip
 TARGET_DIR=./MFTI_MyData/models/weights
 wget -N $URL -O $TAR_FILE

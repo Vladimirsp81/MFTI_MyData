@@ -1,5 +1,5 @@
 FILE=masterplans
-URL=https://docs.live.net/s!AscSoIbqe-jLg9grkaRmO6YHL4IcWg?e=U13MEs
+URL=https://docs.live.net/s!AscSoIbqe-jLg9guCozIEQqgHbgt4w?e=pDmBxk
 TAR_FILE=./MFTI_MyData/datasets/$FILE.zip
 TARGET_DIR=./MFTI_MyData/datasets/$FILE/
 wget -N $URL -O $TAR_FILE
