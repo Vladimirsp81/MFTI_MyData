@@ -10,7 +10,7 @@ from torchvision import transforms
 from PIL import Image
 from Generator_Descriminator import Generator
 
-parser = argparse.ArgumentParser(description='Pix2Pix for edges-shoes')
+parser = argparse.ArgumentParser(description='Pix2Pix for masterplans')
 
 # Общие параметры
 parser.add_argument('--dataroot', required=True, help='path to images (should have subfolders train, val, etc)')
@@ -28,7 +28,7 @@ parser.add_argument('--batchSize', type=int, default=1, help='test Batch size')
 parser.add_argument('--model_path', type=str, default='./MFTI_MyData/models')
 parser.add_argument('--sample_path', type=str, default='./MFTI_MyData/test_results')
 
-##### Вспомогательная функция для загрузки данных и их предобработки
+# Функция для загрузки данных и их предобработки
 IMG_EXTENSIONS = [
     '.jpg', '.JPG', '.jpeg', '.JPEG',
     '.png', '.PNG', '.ppm', '.PPM', '.bmp', '.BMP',
@@ -62,13 +62,12 @@ class ImageFolder(data.Dataset):
     def __len__(self):
         return len(self.image_paths)
 
-##### Вспомогательная функция для тренировки на GPU
+# Функция для тренировки на GPU
 def to_variable(x):
     if torch.cuda.is_available():
         x = x.cuda()
     return Variable(x)
 
-##### Вспомогательная функция для Math
 def denorm(x):
     out = (x + 1) / 2
     return out.clamp(0, 1)
@@ -95,7 +94,7 @@ def main():
 
     g_path = os.path.join(args.model_path, 'generator-%d.pkl' % (args.num_epochs))
 
-    # Объявляем сеть и загружаем веса предобученной модели Генератора
+    # Объявляем сеть и загружаем веса обученной модели Генератора
     generator = Generator(args.batchSize)
     generator.load_state_dict(torch.load(g_path))
     generator.eval()
